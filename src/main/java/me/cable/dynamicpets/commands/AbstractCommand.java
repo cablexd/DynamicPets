@@ -1,6 +1,8 @@
 package me.cable.dynamicpets.commands;
 
 import me.cable.dynamicpets.DynamicPets;
+import me.cable.dynamicpets.handler.PetsConfigHandler;
+import me.cable.dynamicpets.handler.PlayerHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -15,9 +17,13 @@ import java.util.List;
 public abstract class AbstractCommand implements TabExecutor {
 
     protected final DynamicPets dynamicPets;
+    protected final PlayerHandler playerHandler;
+    protected final PetsConfigHandler petsConfigHandler;
 
     public AbstractCommand() {
         dynamicPets = JavaPlugin.getPlugin(DynamicPets.class);
+        playerHandler = dynamicPets.getPlayerHandler();
+        petsConfigHandler = dynamicPets.getPetsConfigHandler();
     }
 
     public void register(@NotNull String label) {

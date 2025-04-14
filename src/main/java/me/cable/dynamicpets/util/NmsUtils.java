@@ -3,10 +3,7 @@ package me.cable.dynamicpets.util;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -25,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class VersionSpecific {
+public final class NmsUtils {
 
     private static @NotNull net.minecraft.world.entity.EquipmentSlot map(@NotNull EquipmentSlot equipmentSlot) {
         return switch (equipmentSlot) {
@@ -45,20 +42,35 @@ public final class VersionSpecific {
         }
     }
 
-    public static @NotNull ArmorStand createArmorStand(@NotNull World world) {
+    private static void sendPacket(@NotNull Packet<?> packet, @NotNull Player player) {
+        ((CraftPlayer) player).getHandle().connection.send(packet);
+    }
+
+    public static @NotNull ArmorStand createArmorStand() {
+        World world = Bukkit.getWorlds().getFirst();
         net.minecraft.world.entity.decoration.ArmorStand a = new net.minecraft.world.entity.decoration.ArmorStand(((CraftWorld) world).getHandle(), 0, 0, 0);
-        ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket(a, 0, new BlockPos(0, 0, 0));
-        sendPacket(packet);
         return (ArmorStand) a.getBukkitEntity();
     }
 
-    public static void updateData(@NotNull Entity entity) {
-        net.minecraft.world.entity.Entity e = ((CraftEntity) entity).getHandle();
-        ClientboundSetEntityDataPacket packet = new ClientboundSetEntityDataPacket(e.getId(), e.getEntityData().getNonDefaultValues());
-        sendPacket(packet);
+    // create entity for player
+    public static void show(@NotNull Player player, @NotNull Entity entity) {
+        ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket(((CraftEntity) entity).getHandle(), 0, new BlockPos(0, 0, 0));
+        sendPacket(packet, player);
     }
 
-    public static void updateEquipment(@NotNull ArmorStand entity) {
+    // remove entity for player
+    public static void hide(@NotNull Player player, @NotNull Entity entity) {
+        ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(entity.getEntityId());
+        sendPacket(packet, player);
+    }
+
+    public static void updateData(@NotNull Player player, @NotNull Entity entity) {
+        net.minecraft.world.entity.Entity e = ((CraftEntity) entity).getHandle();
+        ClientboundSetEntityDataPacket packet = new ClientboundSetEntityDataPacket(e.getId(), e.getEntityData().getNonDefaultValues());
+        sendPacket(packet, player);
+    }
+
+    public static void updateEquipment(@NotNull Player player, @NotNull ArmorStand entity) {
         net.minecraft.world.entity.Entity e = ((CraftEntity) entity).getHandle();
         List<Pair<net.minecraft.world.entity.EquipmentSlot, net.minecraft.world.item.ItemStack>> list = new ArrayList<>();
 
@@ -68,13 +80,13 @@ public final class VersionSpecific {
         }
 
         ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(e.getId(), list);
-        sendPacket(packet);
+        sendPacket(packet, player);
     }
 
-    public static void teleport(@NotNull ArmorStand armorStand, double x, double y, double z, float yaw, float pitch) {
+    public static void teleport(@NotNull Player player, @NotNull ArmorStand armorStand, double x, double y, double z, float yaw, float pitch) {
         net.minecraft.world.entity.decoration.ArmorStand a = ((CraftArmorStand) armorStand).getHandle();
         PositionMoveRotation pmr = new PositionMoveRotation(new Vec3(x, y, z), new Vec3(0, 0, 0), yaw, pitch);
         ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(a.getId(), pmr, Collections.emptySet(), a.onGround);
-        sendPacket(packet);
+        sendPacket(packet, player);
     }
 }

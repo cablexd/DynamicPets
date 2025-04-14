@@ -1,20 +1,13 @@
 package me.cable.dynamicpets.commands;
 
-import me.cable.dynamicpets.util.VersionSpecific;
+import me.cable.dynamicpets.instance.Pet;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class MainCommand extends AbstractCommand {
-
-    private ArmorStand armorStand;
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
@@ -23,20 +16,24 @@ public class MainCommand extends AbstractCommand {
             return true;
         }
 
-        Player player = (Player) commandSender;
-        if (args[0].equals("create")) {
-            armorStand = VersionSpecific.createArmorStand(player.getWorld());
-            armorStand.setInvisible(true);
-            armorStand.getEquipment().setHelmet(new ItemStack(Material.PLAYER_HEAD));
+        switch (args[0]) {
+            case "pet" -> {
+                if (!(commandSender instanceof Player player)) {
+                    commandSender.sendMessage(ChatColor.RED + "Only players may use this command!");
+                    return true;
+                }
 
-            VersionSpecific.updateData(armorStand);
-            VersionSpecific.updateEquipment(armorStand);
-
-            commandSender.sendMessage(ChatColor.GREEN + "Created armor stand.");
-        } else if (args[0].equals("move")) {
-            Location l = player.getLocation();
-            VersionSpecific.teleport(armorStand, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch());
-            commandSender.sendMessage(ChatColor.GREEN + "Updated position of armor stand.");
+                Pet pet = new Pet("dog");
+                playerHandler.givePet(player, pet);
+                playerHandler.equipPet(player, pet);
+                commandSender.sendMessage(ChatColor.GREEN + "Equipped pet dog.");
+            }
+            case "reload" -> {
+                petsConfigHandler.load();
+                playerHandler.reloadPets();
+                commandSender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");
+            }
+            default -> commandSender.sendMessage(ChatColor.RED + "Unknown command!");
         }
 
         return true;

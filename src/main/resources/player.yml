@@ -1,0 +1,7 @@
+equipped-pets:
+  - "0"
+  - "2"
+
+pets:
+  0:
+    type: "pet type ID"
