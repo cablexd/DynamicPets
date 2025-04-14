@@ -25,8 +25,7 @@ public class MainCommand extends AbstractCommand {
 
                 Pet pet = new Pet("dog");
                 playerHandler.givePet(player, pet);
-                playerHandler.equipPet(player, pet);
-                commandSender.sendMessage(ChatColor.GREEN + "Equipped pet dog.");
+                commandSender.sendMessage(ChatColor.GREEN + "Gave you the dog pet.");
             }
             case "reload" -> {
                 configHandler.load();

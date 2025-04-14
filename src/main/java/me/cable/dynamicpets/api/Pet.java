@@ -45,9 +45,9 @@ public class Pet {
     public void setEquipped(@NotNull Player player, boolean equipped) {
         if (isEquipped(player) != equipped) {
             if (equipped) {
-                DynamicPets.getInstance().getPlayerHandler().equipPet(player, pet);
+                DynamicPets.getInstance().getPlayerHandler().equipPet(player, pet, true);
             } else {
-                DynamicPets.getInstance().getPlayerHandler().unequipPet(player, pet);
+                DynamicPets.getInstance().getPlayerHandler().unequipPet(player, pet, true);
             }
         }
     }

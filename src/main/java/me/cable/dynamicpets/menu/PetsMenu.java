@@ -125,14 +125,14 @@ public class PetsMenu implements InventoryHolder {
 
         if (playerHandler.isPetEquipped(player, pet)) {
             // unequip
-            playerHandler.unequipPet(player, pet);
+            playerHandler.unequipPet(player, pet, true);
             update();
         } else {
             // try equip
             int max = PlayerHandler.getPetSlots(player);
 
             if (equippedPets.size() < max) {
-                playerHandler.equipPet(player, pet);
+                playerHandler.equipPet(player, pet, true);
                 update();
             } else {
                 player.sendMessage(Component.text("You cannot equip any more pets!").color(NamedTextColor.RED));

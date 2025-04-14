@@ -29,14 +29,12 @@ import java.util.Map;
 public class PlayerHandler implements Listener {
 
     private final DynamicPets dynamicPets;
-    private final ConfigHandler configHandler;
     private final PetsConfigHandler petsConfigHandler;
 
     private final Map<Player, PlayerData> playerData = new HashMap<>();
 
     public PlayerHandler(@NotNull DynamicPets dynamicPets) {
         this.dynamicPets = dynamicPets;
-        configHandler = dynamicPets.getConfigHandler();
         petsConfigHandler = dynamicPets.getPetsConfigHandler();
 
         Bukkit.getOnlinePlayers().forEach(this::loadPlayerData); // in case of reload
@@ -78,7 +76,7 @@ public class PlayerHandler implements Listener {
             }
 
             playerData.equippedPets.clear();
-            storedEquippedPets.forEach(v -> equipPet(player, v));
+            storedEquippedPets.forEach(v -> equipPet(player, v, false));
         }
     }
 
@@ -90,7 +88,7 @@ public class PlayerHandler implements Listener {
         getPlayerData(player).pets.remove(pet);
     }
 
-    public @NotNull EquippedPet equipPet(@NotNull Player player, @NotNull Pet pet) {
+    public @NotNull EquippedPet equipPet(@NotNull Player player, @NotNull Pet pet, boolean callEvent) {
         EquippedPet equippedPet = new EquippedPet(pet, player);
 
         for (Movement movement : List.of(
@@ -106,20 +104,24 @@ public class PlayerHandler implements Listener {
         }
 
         getPlayerData(player).equippedPets.add(equippedPet);
-        new PetEquipEvent(player, new me.cable.dynamicpets.api.Pet(pet)).callEvent();
+
+        if (callEvent) {
+            new PetEquipEvent(player, new me.cable.dynamicpets.api.Pet(pet)).callEvent();
+        }
+
         return equippedPet;
     }
 
-    public void unequipPet(@NotNull Player player, @NotNull EquippedPet equippedPet) {
-        equippedPet.getEntityDisplay().setWorld(null); // hide pet
-        getPlayerData(player).equippedPets.remove(equippedPet);
-        new PetUnequipEvent(player, new me.cable.dynamicpets.api.Pet(equippedPet.getPet())).callEvent();
-    }
-
-    public void unequipPet(@NotNull Player player, @NotNull Pet pet) {
+    public void unequipPet(@NotNull Player player, @NotNull Pet pet, boolean callEvent) {
         for (EquippedPet equippedPet : getPlayerData(player).equippedPets) {
             if (equippedPet.getPet().equals(pet)) {
-                unequipPet(player, equippedPet);
+                equippedPet.getEntityDisplay().setWorld(null); // hide pet
+                getPlayerData(player).equippedPets.remove(equippedPet);
+
+                if (callEvent) {
+                    new PetUnequipEvent(player, new me.cable.dynamicpets.api.Pet(equippedPet.getPet())).callEvent();
+                }
+
                 break;
             }
         }
@@ -198,7 +200,7 @@ public class PlayerHandler implements Listener {
 
                     // check if pet was equipped
                     if (equippedPetIds.contains(Integer.parseInt(key))) {
-                        equipPet(player, pet);
+                        equipPet(player, pet, false);
                     }
                 }
             }
