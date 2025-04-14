@@ -15,7 +15,7 @@ import java.util.Random;
 
 public abstract class Movement {
 
-    public static final double GOAL_RANGE = 0.3;
+    public static final double GOAL_RANGE = 0.5;
 
     private final String id;
     protected final EquippedPet equippedPet;
