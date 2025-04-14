@@ -1,12 +1,12 @@
 name: "Dog"
 description:
-  - "An interesting pet."
+  - "Man's best friend."
 small: false
 head-texture: "ewogICJ0aW1lc3RhbXAiIDogMTc0NDYzNjU4Njc0NSwKICAicHJvZmlsZUlkIiA6ICJmZDlhMmNhNGNhMWM0YTkwYWEyODkyNThkYmM3MmFiNSIsCiAgInByb2ZpbGVOYW1lIiA6ICJJRnJhbmtvWCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8yZGFiYjQ0ODdlYmYyMWQxMjc1MTVmMzZkMjEyNGVlZjg2YmRkNjY3MWE2YThmOWVjNWQzZGQyNzhmZmE2NzNiIgogICAgfQogIH0KfQ=="
 
 movement-cooldown:
-  min: 20
-  max: 100
+  min: 40
+  max: 80
 
 movements:
   follow:
@@ -21,13 +21,13 @@ movements:
     duration: 20
     height: 2.0
   orbit:
-    enabled: true
+    enabled: false
     duration: 1200
     period: 200
     radius: 10.0
   teleport:
     enabled: true
-    trigger-distance: 100.0
+    trigger-distance: 50.0
   walk:
     enabled: true
     speed: 1.0

@@ -2,19 +2,15 @@ package me.cable.dynamicpets.util;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.inventory.CraftItemMetas;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -38,7 +34,14 @@ public final class Utils {
             String line = list.get(i);
             if (!line.contains(placeholder)) continue;
 
-            String[] parts = line.split(Pattern.quote(placeholder));
+            String[] parts;
+
+            if (line.equals(placeholder)) {
+                parts = new String[]{"", ""}; // nothing to add on either side
+            } else {
+                parts = line.split(Pattern.quote(placeholder));
+            }
+
             list.remove(i);
 
             for (String s : insert) {

@@ -8,6 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +32,13 @@ public class PetsConfigHandler {
 
         if (!petsFolder.exists()) {
             petsFolder.mkdirs();
+
+            // copy dog file
+            try (InputStream in = DynamicPets.class.getResourceAsStream("/pet.yml")) {
+                Files.copy(in, new File(petsFolder, "dog.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return;
         }
         if (!petsFolder.isDirectory()) {
