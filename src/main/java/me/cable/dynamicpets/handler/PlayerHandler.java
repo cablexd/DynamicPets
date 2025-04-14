@@ -6,6 +6,7 @@ import me.cable.dynamicpets.api.event.PetUnequipEvent;
 import me.cable.dynamicpets.instance.EquippedPet;
 import me.cable.dynamicpets.instance.Pet;
 import me.cable.dynamicpets.instance.movement.*;
+import me.cable.dynamicpets.menu.PetsMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
+    Handles player data including pets and equipped pets.
+ */
 public class PlayerHandler implements Listener {
 
     private final DynamicPets dynamicPets;
@@ -104,6 +108,7 @@ public class PlayerHandler implements Listener {
         }
 
         getPlayerData(player).equippedPets.add(equippedPet);
+        PetsMenu.update(player);
 
         if (callEvent) {
             new PetEquipEvent(player, new me.cable.dynamicpets.api.Pet(pet)).callEvent();
@@ -117,6 +122,7 @@ public class PlayerHandler implements Listener {
             if (equippedPet.getPet().equals(pet)) {
                 equippedPet.getEntityDisplay().setWorld(null); // hide pet
                 getPlayerData(player).equippedPets.remove(equippedPet);
+                PetsMenu.update(player);
 
                 if (callEvent) {
                     new PetUnequipEvent(player, new me.cable.dynamicpets.api.Pet(equippedPet.getPet())).callEvent();

@@ -27,7 +27,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class PetsMenu implements InventoryHolder {
@@ -51,6 +53,12 @@ public class PetsMenu implements InventoryHolder {
         pets = playerHandler.getPets(player);
 
         itemKey = new NamespacedKey(dynamicPets, "pet-index");
+    }
+
+    public static void update(@NotNull Player player) {
+        if (player.getOpenInventory().getTopInventory().getHolder() instanceof PetsMenu petsMenu) {
+            petsMenu.update();
+        }
     }
 
     public void open() {
