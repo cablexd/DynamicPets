@@ -29,6 +29,7 @@ public class MainCommand extends AbstractCommand {
                 commandSender.sendMessage(ChatColor.GREEN + "Equipped pet dog.");
             }
             case "reload" -> {
+                configHandler.load();
                 petsConfigHandler.load();
                 playerHandler.reloadPets();
                 commandSender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");

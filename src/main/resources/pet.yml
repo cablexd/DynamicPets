@@ -1,6 +1,8 @@
 name: "Dog"
 description:
   - "An interesting pet."
+small: false
+head-texture: "ewogICJ0aW1lc3RhbXAiIDogMTc0NDYzNjU4Njc0NSwKICAicHJvZmlsZUlkIiA6ICJmZDlhMmNhNGNhMWM0YTkwYWEyODkyNThkYmM3MmFiNSIsCiAgInByb2ZpbGVOYW1lIiA6ICJJRnJhbmtvWCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8yZGFiYjQ0ODdlYmYyMWQxMjc1MTVmMzZkMjEyNGVlZjg2YmRkNjY3MWE2YThmOWVjNWQzZGQyNzhmZmE2NzNiIgogICAgfQogIH0KfQ=="
 
 movement-cooldown:
   min: 20

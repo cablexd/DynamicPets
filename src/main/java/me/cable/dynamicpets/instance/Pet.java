@@ -1,6 +1,5 @@
 package me.cable.dynamicpets.instance;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /*

@@ -1,7 +1,10 @@
 package me.cable.dynamicpets.handler;
 
 import me.cable.dynamicpets.DynamicPets;
+import me.cable.dynamicpets.util.Utils;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -39,6 +42,11 @@ public class PetsConfigHandler {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(petsFolder, fileName));
             petConfigs.put(petId, config);
         }
+    }
+
+    public @NotNull ItemStack getHead(@NotNull String petType) {
+        String headTexture = getPetConfig(petType).getString("head-texture");
+        return (headTexture == null) ? new ItemStack(Material.PLAYER_HEAD) : Utils.createHead(headTexture);
     }
 
     public boolean isValidPetType(@NotNull String petType) {

@@ -1,10 +1,13 @@
 package me.cable.dynamicpets.handler;
 
 import me.cable.dynamicpets.DynamicPets;
+import me.cable.dynamicpets.api.event.PetEquipEvent;
+import me.cable.dynamicpets.api.event.PetUnequipEvent;
 import me.cable.dynamicpets.instance.EquippedPet;
 import me.cable.dynamicpets.instance.Pet;
 import me.cable.dynamicpets.instance.movement.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,15 +29,30 @@ import java.util.Map;
 public class PlayerHandler implements Listener {
 
     private final DynamicPets dynamicPets;
+    private final ConfigHandler configHandler;
     private final PetsConfigHandler petsConfigHandler;
 
     private final Map<Player, PlayerData> playerData = new HashMap<>();
 
     public PlayerHandler(@NotNull DynamicPets dynamicPets) {
         this.dynamicPets = dynamicPets;
+        configHandler = dynamicPets.getConfigHandler();
         petsConfigHandler = dynamicPets.getPetsConfigHandler();
 
+        Bukkit.getOnlinePlayers().forEach(this::loadPlayerData); // in case of reload
         Bukkit.getServer().getPluginManager().registerEvents(this, dynamicPets);
+    }
+
+    public static int getPetSlots(@NotNull Player player) {
+        int max = 100;
+
+        for (int i = 1; i <= max; i++) {
+            if (!player.hasPermission("dynamicpets.petslot." + i)) {
+                return i - 1;
+            }
+        }
+
+        return max;
     }
 
     private @NotNull PlayerData getPlayerData(@NotNull Player player) {
@@ -88,14 +106,23 @@ public class PlayerHandler implements Listener {
         }
 
         getPlayerData(player).equippedPets.add(equippedPet);
-        // TODO: update inventory
+        new PetEquipEvent(player, new me.cable.dynamicpets.api.Pet(pet)).callEvent();
         return equippedPet;
     }
 
     public void unequipPet(@NotNull Player player, @NotNull EquippedPet equippedPet) {
         equippedPet.getEntityDisplay().setWorld(null); // hide pet
         getPlayerData(player).equippedPets.remove(equippedPet);
-        // TODO: update inventory
+        new PetUnequipEvent(player, new me.cable.dynamicpets.api.Pet(equippedPet.getPet())).callEvent();
+    }
+
+    public void unequipPet(@NotNull Player player, @NotNull Pet pet) {
+        for (EquippedPet equippedPet : getPlayerData(player).equippedPets) {
+            if (equippedPet.getPet().equals(pet)) {
+                unequipPet(player, equippedPet);
+                break;
+            }
+        }
     }
 
     public @NotNull List<Pet> getPets(@NotNull Player player) {
@@ -104,6 +131,10 @@ public class PlayerHandler implements Listener {
 
     public @NotNull List<EquippedPet> getEquippedPets(@NotNull Player player) {
         return List.copyOf(getPlayerData(player).equippedPets);
+    }
+
+    private @NotNull List<Pet> getEquippedPetsRegular(@NotNull Player player) {
+        return getPlayerData(player).equippedPets.stream().map(EquippedPet::getPet).toList();
     }
 
     private @NotNull List<EquippedPet> getEquippedPets(@NotNull World world) {
@@ -118,6 +149,26 @@ public class PlayerHandler implements Listener {
         }
 
         return list;
+    }
+
+    public boolean isPetEquipped(@NotNull Player player, @NotNull Pet pet) {
+        return getEquippedPetsRegular(player).contains(pet);
+    }
+
+    private void tpPetsToPlayer(@NotNull Player player) {
+        // teleport all player's pets to them, including changing the world
+        PlayerData pd = getPlayerData(player);
+        World world = player.getWorld();
+        Location loc = player.getLocation();
+
+        for (EquippedPet equippedPet : pd.equippedPets) {
+            if (equippedPet.getCurrentMovement() != null) {
+                equippedPet.getCurrentMovement().end();
+            }
+
+            equippedPet.getEntityDisplay().setWorld(world);
+            equippedPet.getEntityDisplay().setPosition(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw());
+        }
     }
 
     private void showPetsInWorld(@NotNull Player player) {
@@ -156,18 +207,18 @@ public class PlayerHandler implements Listener {
 
     private void savePlayerData(@NotNull Player player) {
         YamlConfiguration saving = new YamlConfiguration();
-        PlayerData pd = getPlayerData(player);
-        List<Pet> equipped = pd.equippedPets.stream().map(EquippedPet::getPet).toList();
+        List<Pet> equipped = getEquippedPetsRegular(player);
         List<Integer> equippedPetKeys = new ArrayList<>();
 
         ConfigurationSection petsSection = saving.createSection("pets");
         int nextKey = 0;
 
         // save pets
-        for (Pet pet : pd.pets) {
+        for (Pet pet : getPlayerData(player).pets) {
             ConfigurationSection petSection = petsSection.createSection(Integer.toString(nextKey));
             petSection.set("type", pet.getType());
 
+            // save equipped
             if (equipped.contains(pet)) {
                 equippedPetKeys.add(nextKey);
             }
@@ -184,6 +235,11 @@ public class PlayerHandler implements Listener {
             dynamicPets.getLogger().severe("Unable to save player data: " + player.getUniqueId());
             e.printStackTrace();
         }
+    }
+
+    public void savePlayerData() {
+        // save all player data
+        Bukkit.getOnlinePlayers().forEach(this::savePlayerData);
     }
 
     @EventHandler
@@ -209,7 +265,9 @@ public class PlayerHandler implements Listener {
 
     @EventHandler
     private void onPlayerChangedWorld(@NotNull PlayerChangedWorldEvent event) {
-        showPetsInWorld(event.getPlayer());
+        Player player = event.getPlayer();
+        tpPetsToPlayer(player);
+        showPetsInWorld(player);
     }
 
     private static class PlayerData {

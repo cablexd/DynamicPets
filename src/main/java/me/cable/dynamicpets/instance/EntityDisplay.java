@@ -17,6 +17,9 @@ import java.util.function.Consumer;
  */
 public class EntityDisplay {
 
+    private static final double BODY_HEIGHT_BIG = 1.43;
+    private static final double BODY_HEIGHT_SMALL = 0.72;
+
     private final ArmorStand armorStand;
     private @Nullable World world;
     private double x, y, z;
@@ -33,7 +36,7 @@ public class EntityDisplay {
     }
 
     private void updatePosition(@NotNull Player player) {
-        NmsUtils.teleport(player, armorStand, x, y, z, yaw, 0);
+        NmsUtils.teleport(player, armorStand, x, y - (armorStand.isSmall() ? BODY_HEIGHT_SMALL : BODY_HEIGHT_BIG), z, yaw, 0);
     }
 
     /*
@@ -90,9 +93,5 @@ public class EntityDisplay {
 
     public void setPosition(double x, double y, double z) {
         setPosition(x, y, z, yaw);
-    }
-
-    public boolean isSmall() {
-        return armorStand.isSmall();
     }
 }

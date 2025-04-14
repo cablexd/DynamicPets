@@ -19,7 +19,7 @@ public class OrbitMovement extends Movement {
         double rad = Math.toRadians(angleDeg);
         double x = Math.sin(rad) * radius;
         double z = Math.cos(rad) * radius;
-        Location loc = player.getLocation().add(x, 1 - getBodyHeight(), z);
+        Location loc = player.getLocation().add(x, 1, z);
 
         float yaw = (float) angleDeg;
         if (yaw < 0) yaw = 360 + yaw;

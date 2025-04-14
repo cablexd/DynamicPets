@@ -1,12 +1,11 @@
 package me.cable.dynamicpets.instance;
 
 import me.cable.dynamicpets.DynamicPets;
+import me.cable.dynamicpets.handler.PetsConfigHandler;
 import me.cable.dynamicpets.instance.movement.Movement;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,10 +32,18 @@ public final class EquippedPet {
     }
 
     private void setup() {
+        PetsConfigHandler petsConfigHandler = DynamicPets.getInstance().getPetsConfigHandler();
         Location loc = owner.getLocation();
-        entityDisplay.updateData(a -> a.setInvisible(true));
-        entityDisplay.updateEquipment(a -> a.setHelmet(new ItemStack(Material.PLAYER_HEAD)));
-        entityDisplay.setPosition(loc.getX(), loc.getY() - Movement.getBodyHeight(false), loc.getZ(), loc.getYaw());
+
+        entityDisplay.updateData(a -> {
+            a.setInvisible(true);
+
+            if (petsConfigHandler.getPetConfig(pet.getType()).getBoolean("small")) {
+                a.setSmall(true);
+            }
+        });
+        entityDisplay.updateEquipment(a -> a.setHelmet(petsConfigHandler.getHead(pet.getType())));
+        entityDisplay.setPosition(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw());
         entityDisplay.setWorld(owner.getWorld());
     }
 

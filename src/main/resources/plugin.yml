@@ -8,3 +8,5 @@ commands:
     permission: "dynamicpets.command.dynamicpets"
     aliases:
       - "dp"
+  pets:
+    permission: "dynamicpets.command.pets"

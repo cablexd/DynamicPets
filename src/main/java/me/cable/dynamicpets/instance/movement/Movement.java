@@ -1,6 +1,5 @@
 package me.cable.dynamicpets.instance.movement;
 
-import me.cable.dynamicpets.DynamicPets;
 import me.cable.dynamicpets.instance.EntityDisplay;
 import me.cable.dynamicpets.instance.EquippedPet;
 import org.bukkit.Location;
@@ -16,8 +15,6 @@ import java.util.Random;
 
 public abstract class Movement {
 
-    public static final double BODY_HEIGHT_BIG = 1.43;
-    public static final double BODY_HEIGHT_SMALL = 0.72;
     public static final double GOAL_RANGE = 0.3;
 
     private final String id;
@@ -32,14 +29,6 @@ public abstract class Movement {
         this.equippedPet = equippedPet;
         this.entityDisplay = equippedPet.getEntityDisplay();
         this.player = equippedPet.getOwner();
-    }
-
-    public static double getBodyHeight(boolean small) {
-        return small ? BODY_HEIGHT_SMALL : BODY_HEIGHT_BIG;
-    }
-
-    public double getBodyHeight() {
-        return getBodyHeight(entityDisplay.isSmall());
     }
 
     /*
@@ -59,7 +48,7 @@ public abstract class Movement {
 
     public abstract void start();
 
-    protected final void end() {
+    public final void end() {
         onEnd();
         equippedPet.setCurrentMovement(null);
     }
@@ -75,9 +64,7 @@ public abstract class Movement {
 
     protected final @NotNull Location getGroundLocation(@NotNull Location loc) {
         loc = loc.clone(); // prevent modifying passed in location
-
         Block groundBlock = loc.getBlock();
-        double bodyHeight = getBodyHeight();
 
         if (groundBlock.getType().isAir()) {
             for (int i = 0; i < 10 && groundBlock.getType().isAir(); i++) {
@@ -85,7 +72,7 @@ public abstract class Movement {
             }
 
             if (!groundBlock.getType().isAir()) {
-                loc.setY(groundBlock.getY() + 1 - bodyHeight);
+                loc.setY(groundBlock.getY() + 1);
                 return loc;
             }
         } else {
@@ -94,12 +81,11 @@ public abstract class Movement {
             }
 
             if (groundBlock.getType().isAir()) {
-                loc.setY(groundBlock.getY() - bodyHeight);
+                loc.setY(groundBlock.getY());
                 return loc;
             }
         }
 
-        loc.setY(loc.getY() - bodyHeight);
         return loc;
     }
 
