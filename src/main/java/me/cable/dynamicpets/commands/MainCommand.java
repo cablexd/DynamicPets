@@ -5,11 +5,9 @@ import me.cable.dynamicpets.util.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +26,6 @@ public class MainCommand extends AbstractCommand {
 
         switch (args[0]) {
             case "give" -> {
-                // dp give <player> <pet>
                 if (args.length < 3) {
                     commandSender.sendMessage(Component.text("Usage: /" + s + " give <player> <pet>", NamedTextColor.RED));
                     return true;
@@ -51,9 +48,9 @@ public class MainCommand extends AbstractCommand {
                 configHandler.load();
                 petsConfigHandler.load();
                 playerHandler.reloadPets();
-                commandSender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");
+                commandSender.sendMessage(Component.text("Configuration reloaded.", NamedTextColor.GREEN));
             }
-            default -> commandSender.sendMessage(ChatColor.RED + "Unknown command!");
+            default -> commandSender.sendMessage(Component.text("Unknown command!", NamedTextColor.RED));
         }
 
         return true;
@@ -67,6 +64,20 @@ public class MainCommand extends AbstractCommand {
             for (String string : List.of("give", "reload")) {
                 if (string.startsWith(args[0])) {
                     result.add(string);
+                }
+            }
+        } else if (args[0].equals("give")) {
+            if (args.length == 2) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getName().startsWith(args[1])) {
+                        result.add(player.getName());
+                    }
+                }
+            } else if (args.length == 3) {
+                for (String petId : petsConfigHandler.getPetIds()) {
+                    if (petId.startsWith(args[2])) {
+                        result.add(petId);
+                    }
                 }
             }
         }

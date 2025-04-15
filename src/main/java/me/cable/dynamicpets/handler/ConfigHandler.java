@@ -22,6 +22,8 @@ public class ConfigHandler {
 
     public void load() {
         if (!configFile.exists()) {
+            configFile.getParentFile().mkdirs();
+
             try (InputStream in = DynamicPets.class.getResourceAsStream("/config.yml")) {
                 Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {

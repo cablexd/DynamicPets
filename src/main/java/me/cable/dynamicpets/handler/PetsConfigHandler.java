@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PetsConfigHandler {
 
@@ -39,10 +41,6 @@ public class PetsConfigHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return;
-        }
-        if (!petsFolder.isDirectory()) {
-            return;
         }
 
         String[] children = petsFolder.list();
@@ -53,6 +51,10 @@ public class PetsConfigHandler {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(petsFolder, fileName));
             petConfigs.put(petId, config);
         }
+    }
+
+    public @NotNull List<String> getPetIds() {
+        return petConfigs.keySet().stream().toList();
     }
 
     public @NotNull ItemStack getHead(@NotNull String petType) {
